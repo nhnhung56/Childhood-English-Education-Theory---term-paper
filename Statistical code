@@ -1,0 +1,86 @@
+file <- read.csv(file = "C:\\Users\\user\\Desktop\\test111.csv")
+test111 <- read.csv("~/Desktop/test111.csv", header=TRUE)
+
+str(test111)
+
+head(test111)
+test111$DESPC 
+summary(test111)
+
+
+cor(test111, method="pearson")
+# pearson-correlation test
+
+
+cor.test(test111$DESSL, test111$DESWLlt, method = "pearson", conf.level = 0.95)
+cor.test(test111$DESSL, test111$DESWLlt, method = "spearman", conf.level = 0.95)
+
+test111$DESSL
+A.MEAN<-test111$DESWLlt/1000
+A.DEVIATION<-test111$DESWLltd/1000
+A.COUNT <-test111$DESWC
+B.MEAN <- test111$DESSL/1000
+B.DEVIATION<-test111$DESSLd /1000
+B.COUNT<-test111$DESSC
+
+
+
+
+gen_data <- function(means, sds,samplesizes){
+  n.grp <- length(means)
+  grps <- factor(rep(1:n.grp, samplesizes))
+  dat<- lapply(1:n.grp,function(i){scale(rnorm(samplesizes[i]))*sds[i]+means[i]})
+  y <-do.call(rbind, dat)
+  out <- data.frame(group = grps, y =y)
+  out
+}
+
+
+simulated_data <- gen_data(A.MEAN,A.DEVIATION,A.COUNT)
+av <- aov( y ~ group, data = simulated_data)
+summary(av)
+TukeyHSD(av)
+# Tukey HSD
+
+
+x <- read.csv(file = "C:\\Users\\user\\Desktop\\data333.csv")
+x<-data333
+x <- as.numeric(x)
+str(x)
+
+head(x)
+
+# Normalization
+y <- scale(x)
+
+## if code occurs error , run this code
+y2 <-y[ , which(apply(y, 2, var) != 0)]
+
+# PCA
+pca_y <- prcomp(y)
+
+##  
+pca_y <- prcomp(y2)
+pca_y
+
+#screeplot
+plot(pca_y,type = "l")
+
+# 80% PCA3  /   66% PCA2 
+summary(pca_y)
+
+#each pca line describe data
+round(predict(pca_y),3)
+
+# plot describe pca1 , pca2
+biplot(pca_y)
+
+
+# calculate distance each data
+cluster_y <- dist(y, method="euclidean")
+cluster_y
+
+#hierarchical clustering , method : average
+fit <- hclust(cluster_y, method="ave")
+par(mfrow=c(1,1))
+plot(fit, hang=-1, ylab = "Distance in differences", main = "Variables clustering according to book levels")
